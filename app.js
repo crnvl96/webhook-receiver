@@ -28,10 +28,28 @@ app.get("/", (req, res) => {
 });
 
 // Route for POST requests
-app.post("/", (req, res) => {
+app.post("/", async (req, res) => {
     const timestamp = new Date().toISOString().replace("T", " ").slice(0, 19);
     console.log(`\n\nWebhook received ${timestamp}\n`);
     console.log(JSON.stringify(req.body, null, 2));
+
+    try {
+        const response = await fetch(
+            "https://serena-energia.app.n8n.cloud/webhook-test/2230ea6e-0034-464b-af3b-51ced545ad2d",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(req.body),
+            },
+        );
+
+        console.log(`Forwarded to n8n: ${response.status}`);
+    } catch (error) {
+        console.error("Error forwarding webhook:", error.message);
+    }
+
     res.status(200).end();
 });
 
