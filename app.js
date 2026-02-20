@@ -21,6 +21,24 @@ const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 const PASSPHRASE = process.env.PASSPHRASE ?? "";
 const APP_SECRET = process.env.APP_SECRET;
 
+const N8N_WEBHOOK_URL =
+    "https://serena-energia.app.n8n.cloud/webhook-test/flows-AI_Journey_Calculate_Lead_Discount-endpoint";
+
+async function forwardToN8n(payload) {
+    try {
+        const res = await fetch(N8N_WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+            console.error("n8n webhook forward failed:", res.status, await res.text());
+        }
+    } catch (err) {
+        console.error("n8n webhook forward error:", err.message);
+    }
+}
+
 // PEM from env often has literal \n instead of newlines; normalize for crypto
 function normalizePrivateKey(pem) {
     if (!pem || typeof pem !== "string") return pem;
@@ -111,6 +129,8 @@ app.post("/", async (req, res) => {
             JSON.stringify(decryptedBody, null, 2),
         );
 
+        forwardToN8n(decryptedBody);
+
         let responsePayload;
         if (decryptedBody.action === "ping") {
             responsePayload = { data: { status: "active" } };
@@ -140,6 +160,7 @@ app.post("/", async (req, res) => {
     }
 
     console.log(JSON.stringify(req.body, null, 2));
+    forwardToN8n(req.body);
     res.status(200).end();
 });
 
