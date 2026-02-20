@@ -18,8 +18,6 @@ app.use(
 
 const PORT = process.env.PORT || 10000;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
-const PASSPHRASE = process.env.PASSPHRASE ?? "";
-const APP_SECRET = process.env.APP_SECRET;
 
 const N8N_WEBHOOK_URL =
     "https://serena-energia.app.n8n.cloud/webhook-test/flows-AI_Journey_Calculate_Lead_Discount-endpoint";
@@ -32,7 +30,11 @@ async function forwardToN8n(payload) {
             body: JSON.stringify(payload),
         });
         if (!res.ok) {
-            console.error("n8n webhook forward failed:", res.status, await res.text());
+            console.error(
+                "n8n webhook forward failed:",
+                res.status,
+                await res.text(),
+            );
         }
     } catch (err) {
         console.error("n8n webhook forward error:", err.message);

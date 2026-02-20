@@ -1,0 +1,108 @@
+{
+  "version": "7.3",
+  "data_api_version": "3.0",
+  "routing_model": {
+    "REGISTER": []
+  },
+  "screens": [
+    {
+      "id": "REGISTER",
+      "title": "Calcule seu desconto",
+      "terminal": true,
+      "success": true,
+      "data": {},
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "register_form",
+            "children": [
+              {
+                "type": "TextHeading",
+                "text": "Informações"
+              },
+              {
+                "type": "Dropdown",
+                "name": "state",
+                "label": "Estado",
+                "required": true,
+                "data-source": [
+                  { "id": "1", "title": "Acre" },
+                  { "id": "2", "title": "Alagoas" },
+                  { "id": "3", "title": "Amapá" },
+                  { "id": "4", "title": "Amazonas" },
+                  { "id": "5", "title": "Bahia" },
+                  { "id": "6", "title": "Ceará" },
+                  { "id": "7", "title": "Distrito Federal" },
+                  { "id": "8", "title": "Espírito Santo" },
+                  { "id": "9", "title": "Goiás" },
+                  { "id": "10", "title": "Maranhão" },
+                  { "id": "11", "title": "Mato Grosso" },
+                  { "id": "12", "title": "Mato Grosso do Sul" },
+                  { "id": "13", "title": "Minas Gerais" },
+                  { "id": "14", "title": "Pará" },
+                  { "id": "15", "title": "Paraíba" },
+                  { "id": "16", "title": "Paraná" },
+                  { "id": "17", "title": "Pernambuco" },
+                  { "id": "18", "title": "Piauí" },
+                  { "id": "19", "title": "Rio de Janeiro" },
+                  { "id": "20", "title": "Rio Grande do Norte" },
+                  { "id": "21", "title": "Rio Grande do Sul" },
+                  { "id": "22", "title": "Rondônia" },
+                  { "id": "23", "title": "Roraima" },
+                  { "id": "24", "title": "Santa Catarina" },
+                  { "id": "25", "title": "São Paulo" },
+                  { "id": "26", "title": "Sergipe" },
+                  { "id": "27", "title": "Tocantins" }
+                ]
+              },
+              {
+                "type": "TextInput",
+                "label": "Cidade",
+                "required": true,
+                "name": "city",
+                "input-type": "text"
+              },
+              {
+                "type": "TextInput",
+                "label": "Nome Completo",
+                "required": true,
+                "name": "name",
+                "input-type": "text"
+              },
+              {
+                "type": "TextInput",
+                "label": "Email",
+                "required": true,
+                "name": "email",
+                "input-type": "email"
+              },
+              {
+                "type": "TextInput",
+                "label": "Valor da conta (R$)",
+                "required": true,
+                "name": "bill_value",
+                "input-type": "number"
+              },
+              {
+                "type": "Footer",
+                "label": "Continuar",
+                "on-click-action": {
+                  "name": "data_exchange",
+                  "payload": {
+                    "state": "${form.state}",
+                    "city": "${form.city}",
+                    "name": "${form.name}",
+                    "email": "${form.email}",
+                    "bill_value": "${form.bill_value}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
