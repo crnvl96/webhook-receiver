@@ -66,10 +66,10 @@ export const encryptResponse = (
     aesKeyBuffer,
     initialVectorBuffer,
 ) => {
-    // flip initial vector
+    // Flip the initialization vector (XOR each byte with 0xFF per WhatsApp docs)
     const flipped_iv = [];
     for (const pair of initialVectorBuffer.entries()) {
-        flipped_iv.push(~pair[1]);
+        flipped_iv.push(pair[1] ^ 0xff);
     }
 
     // encrypt response data
