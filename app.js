@@ -16,11 +16,17 @@ app.use(
     }),
 );
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const PASSPHRASE = process.env.PASSPHRASE ?? "";
 const APP_SECRET = process.env.APP_SECRET;
+
+// PEM from env often has literal \n instead of newlines; normalize for crypto
+function normalizePrivateKey(pem) {
+    if (!pem || typeof pem !== "string") return pem;
+    return pem.replace(/\\n/g, "\n").trim();
+}
+const PRIVATE_KEY = normalizePrivateKey(process.env.PRIVATE_KEY);
 
 function isEncryptedFlowRequest(body) {
     return (
@@ -84,18 +90,26 @@ app.post("/", async (req, res) => {
 
         let decryptedRequest;
         try {
-            decryptedRequest = decryptRequest(req.body, PRIVATE_KEY, PASSPHRASE);
+            decryptedRequest = decryptRequest(
+                req.body,
+                PRIVATE_KEY,
+                PASSPHRASE,
+            );
         } catch (err) {
-            console.error(err);
+            console.error("Decryption failed:", err.name, err.message);
             if (err instanceof FlowEndpointException) {
                 return res.status(err.statusCode).end();
             }
+            // Any other decryption error (e.g. wrong key, bad PEM) → 421 so client can refresh key
             return res.status(421).end();
         }
 
         const { decryptedBody, aesKeyBuffer, initialVectorBuffer } =
             decryptedRequest;
-        console.log("Decrypted Flow payload:", JSON.stringify(decryptedBody, null, 2));
+        console.log(
+            "Decrypted Flow payload:",
+            JSON.stringify(decryptedBody, null, 2),
+        );
 
         let responsePayload;
         if (decryptedBody.action === "ping") {
@@ -116,7 +130,13 @@ app.post("/", async (req, res) => {
         return res
             .status(200)
             .type("text/plain")
-            .send(encryptResponse(responsePayload, aesKeyBuffer, initialVectorBuffer));
+            .send(
+                encryptResponse(
+                    responsePayload,
+                    aesKeyBuffer,
+                    initialVectorBuffer,
+                ),
+            );
     }
 
     console.log(JSON.stringify(req.body, null, 2));
